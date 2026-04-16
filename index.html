@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FORMA — Design de Produto</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;1,9..40,200&family=DM+Serif+Display:ital@0;1&display=swap');
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #000000;
+    --surface2: #3e3e3e;
+    --border: rgba(255,255,255,0.06);
+    --text: #f0ede8;
+    --text-dim: rgba(240,237,232,0.45);
+    --accent: #c8b89a;
+    --accent2: #8a7a6a;
+    --white: #ffffff;
+    --radius: 20px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid rgba(200,184,154,0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s, border-color 0.3s, left 0.08s ease-out, top 0.08s ease-out;
+  }
+  .cursor-ring.expand {
+    width: 60px; height: 60px;
+    border-color: rgba(200,184,154,0.7);
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 48px;
+    transition: background 0.4s;
+  }
+  nav.scrolled {
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 48px;
+  }
+  .nav-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    letter-spacing: 0.08em;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    background: var(--accent);
+    color: var(--bg);
+    padding: 10px 24px;
+    border-radius: 100px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 400;
+    text-decoration: none;
+    transition: opacity 0.3s;
+  }
+  .nav-cta:hover { opacity: 0.85; }
+
+  /* HERO */
+  #hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  #hero-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+  }
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 860px;
+    padding: 0 24px;
+  }
+  .hero-tag {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(200,184,154,0.3);
+    padding: 6px 18px;
+    border-radius: 100px;
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeUp 1s 0.3s forwards;
+  }
+  .hero-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(56px, 8vw, 110px);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 1s 0.5s forwards;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .hero-sub {
+    font-size: clamp(15px, 2vw, 18px);
+    color: var(--text-dim);
+    line-height: 1.7;
+    max-width: 520px;
+    margin: 0 auto 52px;
+    opacity: 0;
+    animation: fadeUp 1s 0.7s forwards;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    animation: fadeUp 1s 0.9s forwards;
+  }
+  .btn-primary {
+    background: var(--text);
+    color: var(--bg);
+    padding: 16px 40px;
+    border-radius: 100px;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 400;
+    text-decoration: none;
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-2px); }
+  .btn-ghost {
+    color: var(--text-dim);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.3s;
+  }
+  .btn-ghost::after { content: '→'; transition: transform 0.3s; }
+  .btn-ghost:hover { color: var(--text); }
+  .btn-ghost:hover::after { transform: translateX(4px); }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 48px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    animation: fadeUp 1s 1.2s forwards;
+    z-index: 2;
+  }
+  .scroll-indicator span {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .scroll-line {
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  /* MARQUEE */
+  .marquee-section {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    padding: 20px 0;
+    background: var(--surface);
+  }
+  .marquee-track {
+    display: flex;
+    gap: 60px;
+    white-space: nowrap;
+    animation: marquee 20s linear infinite;
+  }
+  .marquee-item {
+    font-family: 'DM Serif Display', serif;
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 60px;
+  }
+  .marquee-item::after {
+    content: '◆';
+    font-size: 8px;
+    color: var(--accent2);
+  }
+
+  /* ABOUT SECTION */
+  #about {
+    padding: 140px 48px;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 120px;
+    align-items: center;
+  }
+  .about-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+  }
+  .about-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(36px, 4vw, 56px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 32px;
+  }
+  .about-title em { font-style: italic; color: var(--accent); }
+  .about-body {
+    color: var(--text-dim);
+    font-size: 16px;
+    line-height: 1.8;
+    margin-bottom: 40px;
+  }
+  .about-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+  .stat-number {
+    font-family: 'DM Serif Display', serif;
+    font-size: 48px;
+    line-height: 1;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .about-visual {
+    position: relative;
+    aspect-ratio: 1;
+  }
+  #about-canvas {
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius);
+  }
+
+  /* PRODUCTS */
+  #products {
+    padding: 140px 48px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 80px;
+  }
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(36px, 4vw, 52px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .section-title em { font-style: italic; color: var(--accent); }
+  .section-link {
+    color: var(--text-dim);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.3s;
+    flex-shrink: 0;
+    margin-bottom: 8px;
+  }
+  .section-link::after { content: '→'; transition: transform 0.3s; }
+  .section-link:hover { color: var(--text); }
+  .section-link:hover::after { transform: translateX(4px); }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .product-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94), border-color 0.3s;
+    cursor: none;
+  }
+  .product-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(200,184,154,0.2);
+  }
+  .product-canvas-wrap {
+    position: relative;
+    height: 280px;
+    background: var(--surface2);
+    overflow: hidden;
+  }
+  .product-canvas-wrap canvas {
+    width: 100%;
+    height: 100%;
+  }
+  .product-info {
+    padding: 28px;
+  }
+  .product-tag {
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 10px;
+  }
+  .product-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+  .product-desc {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .product-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+  }
+  .product-price {
+    font-size: 20px;
+    font-weight: 300;
+  }
+  .product-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 8px 20px;
+    border-radius: 100px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: none;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.3s;
+  }
+  .product-btn:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+
+  /* FEATURE SECTION */
+  #feature {
+    margin: 0 48px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    padding: 120px 80px;
+    overflow: hidden;
+    position: relative;
+  }
+  .feature-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 100px;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .feature-canvas-wrap {
+    aspect-ratio: 1;
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--surface2);
+  }
+  .feature-canvas-wrap canvas { width: 100%; height: 100%; }
+  .feature-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(200,184,154,0.06) 0%, transparent 70%);
+    top: 50%; left: 0;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  .feature-body { position: relative; z-index: 1; }
+  .feature-list {
+    list-style: none;
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .feature-item {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .feature-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 13px;
+    color: var(--accent);
+    padding-top: 2px;
+    flex-shrink: 0;
+  }
+  .feature-text strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+  .feature-text span {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* PROCESS */
+  #process {
+    padding: 140px 48px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    margin-top: 80px;
+    background: var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .step {
+    background: var(--bg);
+    padding: 48px 36px;
+    transition: background 0.3s;
+    position: relative;
+  }
+  .step:hover { background: var(--surface); }
+  .step-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 56px;
+    line-height: 1;
+    color: var(--border);
+    margin-bottom: 24px;
+    transition: color 0.3s;
+  }
+  .step:hover .step-num { color: rgba(200,184,154,0.15); }
+  .step-title {
+    font-size: 18px;
+    font-weight: 300;
+    margin-bottom: 14px;
+  }
+  .step-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+  .step-icon {
+    width: 40px; height: 40px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  /* CTA BANNER */
+  #cta {
+    margin: 0 48px 140px;
+    background: linear-gradient(135deg, #1a1710 0%, #0f0e0d 50%, #111510 100%);
+    border: 1px solid rgba(200,184,154,0.12);
+    border-radius: 28px;
+    padding: 120px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  #cta-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    opacity: 0.6;
+  }
+  .cta-content { position: relative; z-index: 1; }
+  .cta-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(40px, 5vw, 72px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+  }
+  .cta-title em { font-style: italic; color: var(--accent); }
+  .cta-sub {
+    font-size: 17px;
+    color: var(--text-dim);
+    max-width: 480px;
+    margin: 0 auto 48px;
+    line-height: 1.7;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 60px 48px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 60px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .footer-brand { }
+  .footer-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--text);
+    margin-bottom: 16px;
+    letter-spacing: 0.06em;
+  }
+  .footer-tagline {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    max-width: 260px;
+  }
+  .footer-col-title {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 20px;
+  }
+  .footer-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .footer-links a {
+    font-size: 14px;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .footer-links a:hover { color: var(--text); }
+  .footer-bottom {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 48px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-copy {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.1); }
+  }
+
+  /* SCROLL REVEAL */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  @media (max-width: 1024px) {
+    nav { padding: 20px 28px; }
+    .nav-links { display: none; }
+    #about { grid-template-columns: 1fr; gap: 60px; padding: 100px 28px; }
+    #products { padding: 100px 28px; }
+    .products-grid { grid-template-columns: 1fr; }
+    .feature-inner { grid-template-columns: 1fr; gap: 40px; }
+    #feature { margin: 0 24px; padding: 80px 36px; }
+    #process { padding: 100px 28px; }
+    .process-steps { grid-template-columns: 1fr 1fr; }
+    #cta { margin: 0 24px 100px; padding: 80px 36px; }
+    footer { grid-template-columns: 1fr 1fr; gap: 40px; padding: 60px 28px; }
+    .footer-bottom { padding: 20px 28px; flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<!-- Nav -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">FORMA</a>
+  <ul class="nav-links">
+    <li><a href="#about">Studio</a></li>
+    <li><a href="#products">Projetos</a></li>
+    <li><a href="#process">Processo</a></li>
+    <li><a href="#cta">Contato</a></li>
+  </ul>
+  <a href="#cta" class="nav-cta">Iniciar Projeto</a>
+</nav>
+
+<!-- Hero -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-content">
+    <span class="hero-tag">Design de Produto · 3D · Identidade</span>
+    <h1 class="hero-title">Forma que<br><em>transcende</em><br>o tempo</h1>
+    <p class="hero-sub">Criamos objetos e experiências de design que existem além das tendências — peças que carregam significado e precisão em cada detalhe.</p>
+    <div class="hero-actions">
+      <a href="#products" class="btn-primary">Ver Projetos</a>
+      <a href="#about" class="btn-ghost">Nossa filosofia</a>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- Marquee -->
+<div class="marquee-section">
+  <div class="marquee-track" id="marquee">
+    <span class="marquee-item">Design de Produto</span>
+    <span class="marquee-item">Modelagem 3D</span>
+    <span class="marquee-item">Identidade Visual</span>
+    <span class="marquee-item">Prototipagem</span>
+    <span class="marquee-item">Motion Design</span>
+    <span class="marquee-item">Materiais & Acabamento</span>
+    <span class="marquee-item">Design de Produto</span>
+    <span class="marquee-item">Modelagem 3D</span>
+    <span class="marquee-item">Identidade Visual</span>
+    <span class="marquee-item">Prototipagem</span>
+    <span class="marquee-item">Motion Design</span>
+    <span class="marquee-item">Materiais & Acabamento</span>
+  </div>
+</div>
+
+<!-- About -->
+<section id="about">
+  <div class="about-text">
+    <p class="about-label reveal">Sobre o Studio</p>
+    <h2 class="about-title reveal reveal-delay-1">Design que<br>nasce do <em>essencial</em></h2>
+    <p class="about-body reveal reveal-delay-2">Trabalhamos na interseção entre forma, função e narrativa. Cada projeto começa com uma única questão: o que permanece quando tudo o que é supérfluo é removido?</p>
+    <div class="about-stats reveal reveal-delay-3">
+      <div>
+        <div class="stat-number">12+</div>
+        <div class="stat-label">Anos de Experiência</div>
+      </div>
+      <div>
+        <div class="stat-number">200+</div>
+        <div class="stat-label">Projetos Entregues</div>
+      </div>
+      <div>
+        <div class="stat-number">38</div>
+        <div class="stat-label">Clientes Globais</div>
+      </div>
+      <div>
+        <div class="stat-number">06</div>
+        <div class="stat-label">Prêmios de Design</div>
+      </div>
+    </div>
+  </div>
+  <div class="about-visual reveal reveal-delay-2">
+    <canvas id="about-canvas"></canvas>
+  </div>
+</section>
+
+<!-- Products -->
+<section id="products">
+  <div class="section-header">
+    <div>
+      <p class="section-label reveal">Projetos Recentes</p>
+      <h2 class="section-title reveal reveal-delay-1">Peças que<br><em>definem</em> espaço</h2>
+    </div>
+    <a href="#" class="section-link reveal reveal-delay-2">Ver todos</a>
+  </div>
+  <div class="products-grid">
+    <div class="product-card reveal reveal-delay-1">
+      <div class="product-canvas-wrap">
+        <canvas id="prod-canvas-1"></canvas>
+      </div>
+      <div class="product-info">
+        <p class="product-tag">Mobiliário · 2025</p>
+        <h3 class="product-name">Cadeira Arco</h3>
+        <p class="product-desc">Estrutura em aço carbono com assento em madeira torneada. Minimalismo funcional de forma pura.</p>
+        <div class="product-footer">
+          <span class="product-price">R$ 4.800</span>
+          <button class="product-btn">Explorar</button>
+        </div>
+      </div>
+    </div>
+    <div class="product-card reveal reveal-delay-2">
+      <div class="product-canvas-wrap">
+        <canvas id="prod-canvas-2"></canvas>
+      </div>
+      <div class="product-info">
+        <p class="product-tag">Iluminação · 2025</p>
+        <h3 class="product-name">Luminária Órbita</h3>
+        <p class="product-desc">Anel de luz difusa em alumínio fundido. Um estudo sobre geometria e presença no espaço.</p>
+        <div class="product-footer">
+          <span class="product-price">R$ 2.600</span>
+          <button class="product-btn">Explorar</button>
+        </div>
+      </div>
+    </div>
+    <div class="product-card reveal reveal-delay-3">
+      <div class="product-canvas-wrap">
+        <canvas id="prod-canvas-3"></canvas>
+      </div>
+      <div class="product-info">
+        <p class="product-tag">Objeto · 2024</p>
+        <h3 class="product-name">Vaso Fratura</h3>
+        <p class="product-desc">Cerâmica artesanal com linhas geométricas interrompidas. Cada peça é única por sua natureza.</p>
+        <div class="product-footer">
+          <span class="product-price">R$ 890</span>
+          <button class="product-btn">Explorar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Feature -->
+<section id="feature">
+  <div class="feature-glow"></div>
+  <div class="feature-inner">
+    <div class="feature-canvas-wrap reveal">
+      <canvas id="feature-canvas"></canvas>
+    </div>
+    <div class="feature-body">
+      <p class="section-label reveal">Nossa Abordagem</p>
+      <h2 class="section-title reveal reveal-delay-1">Processo<br><em>rigoroso</em>,<br>resultado puro</h2>
+      <ul class="feature-list">
+        <li class="feature-item reveal reveal-delay-1">
+          <span class="feature-num">01</span>
+          <div class="feature-text">
+            <strong>Geometria precisa</strong>
+            <span>Cada ângulo e proporção é calculado para criar harmonia visual e ergonomia natural.</span>
+          </div>
+        </li>
+        <li class="feature-item reveal reveal-delay-2">
+          <span class="feature-num">02</span>
+          <div class="feature-text">
+            <strong>Materiais nobres</strong>
+            <span>Selecionamos materiais que envelhecem com dignidade e ganham caráter com o uso.</span>
+          </div>
+        </li>
+        <li class="feature-item reveal reveal-delay-3">
+          <span class="feature-num">03</span>
+          <div class="feature-text">
+            <strong>Prototipagem em 3D</strong>
+            <span>Do conceito ao modelo físico, cada iteração é validada em ambiente digital antes de ser fabricada.</span>
+          </div>
+        </li>
+        <li class="feature-item reveal reveal-delay-4">
+          <span class="feature-num">04</span>
+          <div class="feature-text">
+            <strong>Produção local</strong>
+            <span>Parceria com ateliês e fabricantes brasileiros de excelência para garantir qualidade e rastreabilidade.</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Process -->
+<section id="process">
+  <div class="section-header">
+    <div>
+      <p class="section-label reveal">Como trabalhamos</p>
+      <h2 class="section-title reveal reveal-delay-1">Do conceito<br>à <em>realidade</em></h2>
+    </div>
+  </div>
+  <div class="process-steps">
+    <div class="step reveal reveal-delay-1">
+      <div class="step-num">01</div>
+      <div class="step-icon">◎</div>
+      <h3 class="step-title">Briefing</h3>
+      <p class="step-desc">Imersão profunda no contexto do projeto para entender necessidades, valores e visão de longo prazo.</p>
+    </div>
+    <div class="step reveal reveal-delay-2">
+      <div class="step-num">02</div>
+      <div class="step-icon">△</div>
+      <h3 class="step-title">Conceito</h3>
+      <p class="step-desc">Desenvolvimento de direções criativas em sketches e modelos de referência. Refinamento até a essência.</p>
+    </div>
+    <div class="step reveal reveal-delay-3">
+      <div class="step-num">03</div>
+      <div class="step-icon">◻</div>
+      <h3 class="step-title">Modelagem 3D</h3>
+      <p class="step-desc">Construção digital precisa com verificação de proporções, materiais e comportamento de luz.</p>
+    </div>
+    <div class="step reveal reveal-delay-4">
+      <div class="step-num">04</div>
+      <div class="step-icon">◈</div>
+      <h3 class="step-title">Produção</h3>
+      <p class="step-desc">Fabricação supervisionada com controle rigoroso de qualidade em cada etapa do processo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <canvas id="cta-canvas"></canvas>
+  <div class="cta-content">
+    <p class="section-label reveal" style="justify-content:center;display:block">Vamos criar juntos</p>
+    <h2 class="cta-title reveal reveal-delay-1">Seu próximo<br>projeto <em>começa</em><br>com uma conversa</h2>
+    <p class="cta-sub reveal reveal-delay-2">Atendemos projetos residenciais, comerciais e de produto. Cada projeto é tratado com o mesmo rigor e atenção ao detalhe.</p>
+    <div class="hero-actions reveal reveal-delay-3">
+      <a href="mailto:contato@forma.studio" class="btn-primary">Enviar Mensagem</a>
+      <a href="#products" class="btn-ghost">Ver portfólio</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-brand">
+    <div class="footer-logo">FORMA</div>
+    <p class="footer-tagline">Studio de design de produto focado em objetos atemporais que carregam significado e precisão.</p>
+  </div>
+  <div>
+    <p class="footer-col-title">Navegação</p>
+    <ul class="footer-links">
+      <li><a href="#about">Studio</a></li>
+      <li><a href="#products">Projetos</a></li>
+      <li><a href="#process">Processo</a></li>
+      <li><a href="#cta">Contato</a></li>
+    </ul>
+  </div>
+  <div>
+    <p class="footer-col-title">Serviços</p>
+    <ul class="footer-links">
+      <li><a href="#">Design de Produto</a></li>
+      <li><a href="#">Modelagem 3D</a></li>
+      <li><a href="#">Identidade Visual</a></li>
+      <li><a href="#">Consultoria</a></li>
+    </ul>
+  </div>
+  <div>
+    <p class="footer-col-title">Redes</p>
+    <ul class="footer-links">
+      <li><a href="#">Instagram</a></li>
+      <li><a href="#">Behance</a></li>
+      <li><a href="#">LinkedIn</a></li>
+    </ul>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <span class="footer-copy">© 2025 FORMA Studio. Todos os direitos reservados.</span>
+  <span class="footer-copy">São Paulo, Brasil</span>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ─── CURSOR ────────────────────────────────────────────────
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+});
+function animRing() {
+  rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+document.querySelectorAll('a, button, .product-card').forEach(el => {
+  el.addEventListener('mouseenter', () => ring.classList.add('expand'));
+  el.addEventListener('mouseleave', () => ring.classList.remove('expand'));
+});
+
+// ─── NAV SCROLL ────────────────────────────────────────────
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// ─── SCROLL REVEAL ─────────────────────────────────────────
+const reveals = document.querySelectorAll('.reveal');
+const ro = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+reveals.forEach(r => ro.observe(r));
+
+// ─── THREE.JS HELPERS ──────────────────────────────────────
+function createScene(canvas, bg = 0x0a0a0a) {
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  const rect = canvas.parentElement ? canvas.parentElement.getBoundingClientRect() : canvas.getBoundingClientRect();
+  const w = canvas.offsetWidth || rect.width || 400;
+  const h = canvas.offsetHeight || rect.height || 400;
+  renderer.setSize(w, h);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setClearColor(0x000000, 0);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100);
+  camera.position.set(0, 0, 5);
+  return { renderer, scene, camera };
+}
+
+function addLights(scene) {
+  const amb = new THREE.AmbientLight(0xffffff, 0.3);
+  const key = new THREE.DirectionalLight(0xc8b89a, 2.5);
+  key.position.set(4, 6, 4);
+  const fill = new THREE.DirectionalLight(0x8899cc, 0.8);
+  fill.position.set(-4, 2, -2);
+  const rim = new THREE.PointLight(0xffeedd, 1.2, 30);
+  rim.position.set(-2, 4, -3);
+  scene.add(amb, key, fill, rim);
+}
+
+// ─── HERO CANVAS ───────────────────────────────────────────
+(function(){
+  const canvas = document.getElementById('hero-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setClearColor(0x000000, 0);
+
+  function resize() {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+  }
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 200);
+  camera.position.set(0, 0, 18);
+  window.addEventListener('resize', resize);
+  resize();
+
+  addLights(scene);
+
+  // Large abstract torus + spheres floating
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x2a2520,
+    metalness: 0.9,
+    roughness: 0.15,
+    envMapIntensity: 1
+  });
+  const matAccent = new THREE.MeshStandardMaterial({
+    color: 0xc8b89a,
+    metalness: 0.85,
+    roughness: 0.1,
+    envMapIntensity: 1
+  });
+
+  const torus = new THREE.Mesh(new THREE.TorusGeometry(4, 0.12, 32, 160), matAccent);
+  scene.add(torus);
+
+  const torus2 = new THREE.Mesh(new THREE.TorusGeometry(5.5, 0.05, 16, 160), mat);
+  torus2.rotation.x = 0.4;
+  scene.add(torus2);
+
+  const sphere = new THREE.Mesh(new THREE.SphereGeometry(1.8, 64, 64), new THREE.MeshStandardMaterial({
+    color: 0x1a1816,
+    metalness: 0.95,
+    roughness: 0.05
+  }));
+  scene.add(sphere);
+
+  // Particles
+  const pGeo = new THREE.BufferGeometry();
+  const pCount = 600;
+  const pPos = new Float32Array(pCount * 3);
+  for (let i = 0; i < pCount; i++) {
+    pPos[i*3] = (Math.random()-0.5) * 40;
+    pPos[i*3+1] = (Math.random()-0.5) * 40;
+    pPos[i*3+2] = (Math.random()-0.5) * 20 - 5;
+  }
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+  const particles = new THREE.Points(pGeo, new THREE.PointsMaterial({ color: 0xc8b89a, size: 0.04, transparent: true, opacity: 0.5 }));
+  scene.add(particles);
+
+  let mouseX = 0, mouseY = 0;
+  document.addEventListener('mousemove', e => {
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+  });
+
+  let t = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    t += 0.005;
+    torus.rotation.x += 0.002;
+    torus.rotation.y += 0.004;
+    torus2.rotation.y += 0.003;
+    torus2.rotation.z += 0.001;
+    sphere.rotation.y += 0.003;
+    particles.rotation.y += 0.0005;
+    camera.position.x += (mouseX * 1.5 - camera.position.x) * 0.04;
+    camera.position.y += (-mouseY * 1.5 - camera.position.y) * 0.04;
+    camera.lookAt(0, 0, 0);
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+
+// ─── ABOUT CANVAS ──────────────────────────────────────────
+(function(){
+  const canvas = document.getElementById('about-canvas');
+  if (!canvas) return;
+  const { renderer, scene, camera } = createScene(canvas);
+  camera.position.set(0, 0, 5);
+  addLights(scene);
+
+  const geo = new THREE.IcosahedronGeometry(1.5, 1);
+  const mat = new THREE.MeshStandardMaterial({ color: 0x1e1c19, metalness: 0.95, roughness: 0.08, wireframe: false });
+  const wireframe = new THREE.Mesh(new THREE.IcosahedronGeometry(1.55, 1), new THREE.MeshBasicMaterial({ color: 0xc8b89a, wireframe: true, opacity: 0.12, transparent: true }));
+  const mesh = new THREE.Mesh(geo, mat);
+  scene.add(mesh, wireframe);
+
+  // Orbiting ring
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(2.1, 0.02, 8, 100), new THREE.MeshStandardMaterial({ color: 0xc8b89a, metalness: 1, roughness: 0.1 }));
+  ring.rotation.x = 1.2;
+  scene.add(ring);
+
+  function animate() {
+    requestAnimationFrame(animate);
+    mesh.rotation.y += 0.006;
+    mesh.rotation.x += 0.002;
+    wireframe.rotation.y += 0.006;
+    wireframe.rotation.x += 0.002;
+    ring.rotation.z += 0.008;
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  new ResizeObserver(() => {
+    const p = canvas.parentElement;
+    renderer.setSize(p.offsetWidth, p.offsetHeight);
+    camera.aspect = p.offsetWidth / p.offsetHeight;
+    camera.updateProjectionMatrix();
+  }).observe(canvas.parentElement);
+})();
+
+// ─── PRODUCT CANVASES ──────────────────────────────────────
+function makeProductScene(id, geometry, color = 0x1e1c19, accentColor = 0xc8b89a) {
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+  const { renderer, scene, camera } = createScene(canvas);
+  camera.position.set(0, 0, 4.5);
+  addLights(scene);
+
+  const mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
+    color, metalness: 0.9, roughness: 0.12
+  }));
+  scene.add(mesh);
+
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(1.5, 0.012, 8, 80),
+    new THREE.MeshStandardMaterial({ color: accentColor, metalness: 1, roughness: 0.05 })
+  );
+  ring.rotation.x = 1.1;
+  scene.add(ring);
+
+  let hover = false;
+  canvas.parentElement.addEventListener('mouseenter', () => hover = true);
+  canvas.parentElement.addEventListener('mouseleave', () => hover = false);
+
+  function animate() {
+    requestAnimationFrame(animate);
+    mesh.rotation.y += hover ? 0.015 : 0.005;
+    mesh.rotation.x += hover ? 0.008 : 0.002;
+    ring.rotation.z += 0.01;
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  new ResizeObserver(() => {
+    const p = canvas.parentElement;
+    renderer.setSize(p.offsetWidth, p.offsetHeight);
+    camera.aspect = p.offsetWidth / p.offsetHeight;
+    camera.updateProjectionMatrix();
+  }).observe(canvas.parentElement);
+}
+
+makeProductScene('prod-canvas-1', new THREE.CylinderGeometry(0.4, 0.6, 1.8, 6), 0x1a1816);
+makeProductScene('prod-canvas-2', new THREE.TorusGeometry(0.9, 0.3, 32, 64), 0x1c1a17);
+makeProductScene('prod-canvas-3', new THREE.SphereGeometry(1, 8, 6), 0x211f1c);
+
+// ─── FEATURE CANVAS ────────────────────────────────────────
+(function(){
+  const canvas = document.getElementById('feature-canvas');
+  if (!canvas) return;
+  const { renderer, scene, camera } = createScene(canvas);
+  camera.position.set(0, 0, 6);
+  addLights(scene);
+
+  const geo = new THREE.BoxGeometry(1.6, 1.6, 1.6, 2, 2, 2);
+  const mat = new THREE.MeshStandardMaterial({ color: 0x1a1816, metalness: 0.92, roughness: 0.1 });
+  const cube = new THREE.Mesh(geo, mat);
+  scene.add(cube);
+
+  const edges = new THREE.EdgesGeometry(new THREE.BoxGeometry(1.65, 1.65, 1.65));
+  const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xc8b89a, opacity: 0.4, transparent: true }));
+  scene.add(line);
+
+  let t = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    t += 0.008;
+    cube.rotation.y = t * 0.5;
+    cube.rotation.x = Math.sin(t * 0.3) * 0.4;
+    line.rotation.y = t * 0.5;
+    line.rotation.x = Math.sin(t * 0.3) * 0.4;
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  new ResizeObserver(() => {
+    const p = canvas.parentElement;
+    renderer.setSize(p.offsetWidth, p.offsetHeight);
+    camera.aspect = p.offsetWidth / p.offsetHeight;
+    camera.updateProjectionMatrix();
+  }).observe(canvas.parentElement);
+})();
+
+// ─── CTA CANVAS ────────────────────────────────────────────
+(function(){
+  const canvas = document.getElementById('cta-canvas');
+  if (!canvas) return;
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setClearColor(0x000000, 0);
+  function resize() {
+    renderer.setSize(canvas.parentElement.offsetWidth, canvas.parentElement.offsetHeight);
+    camera.aspect = canvas.parentElement.offsetWidth / canvas.parentElement.offsetHeight;
+    camera.updateProjectionMatrix();
+  }
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 200);
+  camera.position.set(0, 0, 12);
+  addLights(scene);
+  resize();
+  new ResizeObserver(resize).observe(canvas.parentElement);
+
+  const mat = new THREE.MeshStandardMaterial({ color: 0xc8b89a, metalness: 0.9, roughness: 0.1, transparent: true, opacity: 0.15 });
+  const meshes = [];
+  for (let i = 0; i < 3; i++) {
+    const geo = new THREE.TorusGeometry(2 + i * 1.2, 0.03, 16, 100);
+    const m = new THREE.Mesh(geo, mat);
+    m.rotation.x = i * 0.6 + 0.5;
+    m.rotation.y = i * 0.8;
+    scene.add(m);
+    meshes.push(m);
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    meshes.forEach((m, i) => {
+      m.rotation.z += 0.003 + i * 0.001;
+      m.rotation.x += 0.001;
+    });
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+</script>
+</body>
+</html>
